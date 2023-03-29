@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .border-groove {
+        border-style: groove;
+    }
+    .border-groove-double {
+        border-style: double;
+    }
+    
+}

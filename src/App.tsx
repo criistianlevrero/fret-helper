@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import AppShell from './shell/components/app-shell/app-shell'
+import AppShell from './components/shell/components/app-shell/app-shell'
+import Fretboard from './components/fretboard/components/fretboard/fretboard'
 import './App.css'
 
 function App() {
@@ -8,7 +8,7 @@ function App() {
 
   return (
     <AppShell>
-      
+      <Fretboard></Fretboard>  
     </AppShell>
   )
 }
