@@ -92,5 +92,6 @@ export {
 export type {
   Note,
   NoteStatus,
-  NoteNames
-};
+  NoteNames,
+  Intervals
+}

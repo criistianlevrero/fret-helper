@@ -6,16 +6,33 @@ import { Dispatch } from "redux"
 import { MouseEventHandler } from "react"
 import { RootState } from 'typesafe-actions';
 
-//const fretboardModel:NoteModel[][] = getFretboard()
+import * as selectors from '../../store/selectors';
+import * as actions from '../../store/actions';
 
-function Fretboard(props: { onUnload: () => void, getFretboard :NoteModel[][] }) {
+const mapStateToProps = (state: RootState) => ({
+    fretbardModel: state.todos.fretboard,
+    isLoading: state.todos.isLoadingTodos,
+    directTodos: state.todos.todos,
+    todos: selectors.getTodos(state.todos),
+});
+    const dispatchProps = {
+    removeTodo: actions.removeTodo,
+};
+
+type Props = ReturnType<typeof mapStateToProps> & typeof dispatchProps;
+
+function Fretboard({ isLoading, todos = [], fretbardModel, removeTodo }: Props) {
+    if (isLoading) {
+        return <p>Loading...</p>;
+    }
     
     const onButtonClick = () => {
-        props.onUnload()
+        console.log(fretbardModel)
+        //props.onUnload()
         //console.log(props.viewChangeCounter)
     }
 
-    const renderedNotes = props.getFretboard.map((string:NoteModel[]) => {
+    const renderedNotes = fretbardModel[0].map((string:NoteModel[]) => {
         return string.map((note:NoteModel) => {
             return <Note noteModel={note}></Note>
         })
@@ -32,15 +49,5 @@ function Fretboard(props: { onUnload: () => void, getFretboard :NoteModel[][] })
     )
 }
 
-const mapStateToProps = (state :RootState) => {
-    return {
-        getFretboard: state.fretboard,
-    }
-}
-  ;
-
-const dispatchProps = (dispatch: Dispatch) => ({
-    onUnload: () => dispatch({ type: 'REGISTER_PAGE_UNLOADED' })
-});
 
 export default connect(mapStateToProps, dispatchProps)(Fretboard);
