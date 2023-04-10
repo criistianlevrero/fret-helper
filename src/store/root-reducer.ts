@@ -5,7 +5,7 @@ import fretboardReducer from '../components/fretboard/store/reducer'
 
 const rootReducer = combineReducers({
   router: routerReducer,
-  todos: fretboardReducer,
+  fretboard: fretboardReducer,
 });
 
 export default rootReducer;

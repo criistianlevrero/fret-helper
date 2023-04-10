@@ -27,7 +27,7 @@ const initialState = {};
 // create store
 const store = createStore(rootReducer, initialState, enhancer);
 
-epicMiddleware.run(rootEpic);
+// epicMiddleware.run(rootEpic);
 
 // export store singleton instance
 export default store;
