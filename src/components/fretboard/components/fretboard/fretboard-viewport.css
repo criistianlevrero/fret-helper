@@ -1,6 +1,6 @@
 .fretboard {
   div {
-    @apply bg-stone-700 text-center py-2.5 text-xl border-groove border-r-8 border-slate-300 text-white;
+    @apply bg-stone-700 text-center py-2.5 text-xl border-r-8 border-slate-300 text-white;
     
     &:nth-of-type(1),
     &:nth-of-type(27n + 1) {

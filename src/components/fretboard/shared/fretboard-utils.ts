@@ -1,3 +1,4 @@
+import { Note } from "FretboardModels";
 
 enum NoteStatus {
   inactive = 'inactive',
@@ -35,13 +36,6 @@ enum Intervals {
   m7 = 'm7',
   M7 = 'M7',
   P8 = 'P8',
-}
-
-interface Note {
-  name: NoteNames;
-  status: NoteStatus;
-  pitch?: number;
-  interval?: Intervals;
 }
 
 const chromaticScale: Note[] = [
@@ -90,7 +84,6 @@ export {
 }
 
 export type {
-  Note,
   NoteStatus,
   NoteNames,
   Intervals

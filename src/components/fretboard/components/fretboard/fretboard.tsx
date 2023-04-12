@@ -1,4 +1,4 @@
-import { Note as NoteModel } from "../../shared/fretboard-utils"
+import { Note  as NoteModel } from 'FretboardModels';
 import FretboardViewport from "./fretboard-viewport"
 import Note from "../note/note"
 import { connect } from "react-redux"
@@ -20,9 +20,9 @@ function Fretboard({ fretbardModel }: Props) {
         //console.log(props.viewChangeCounter)
     }
 
-    const renderedNotes = fretbardModel[0].map((string:NoteModel[]) => {
-        return string.map((note:NoteModel) => {
-            return <Note noteModel={note}></Note>
+    const renderedNotes = fretbardModel.map((string:NoteModel[], stringIndex:number) => {
+        return string.map((note:NoteModel, noteIndex) => {
+            return <Note key={`${stringIndex}-${noteIndex}`} noteModel={note} chord={stringIndex} fret={noteIndex}></Note>
         })
     })
 

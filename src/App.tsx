@@ -4,6 +4,7 @@ import Fretboard from './components/fretboard/components/fretboard/fretboard'
 import './App.css'
 import { Provider } from 'react-redux'
 import store from './store/index'
+import TodosView from './components/todos/components/TodosView'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -11,7 +12,9 @@ function App() {
   return (
     <Provider store={store}>
       <AppShell>
-        <Fretboard></Fretboard>  
+        <Fretboard />
+        <div className='divider'></div>
+        <TodosView />
       </AppShell>
 
     </Provider>

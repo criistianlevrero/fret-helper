@@ -1,5 +1,5 @@
 // import { createSelector } from 'reselect';
 
-import { TodosState } from './reducer';
+import { FretboardState } from './reducer';
 
-export const getFretboard = (state: TodosState) => state.fretboard;
+export const getFretboard = (state: FretboardState) => state.fretboard;

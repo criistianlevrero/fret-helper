@@ -14,6 +14,8 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/react-router-redux": "^5.0.21",
     "autoprefixer": "^10.4.13",
+    "cuid": "^3.0.0",
+    "daisyui": "^2.51.5",
     "postcss": "^8.4.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
