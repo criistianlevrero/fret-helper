@@ -22,7 +22,7 @@ function Fretboard({ fretbardModel }: Props) {
 
     const renderedNotes = fretbardModel.map((string:NoteModel[], stringIndex:number) => {
         return string.map((note:NoteModel, noteIndex) => {
-            return <Note key={`${stringIndex}-${noteIndex}`} noteModel={note} chord={stringIndex} fret={noteIndex}></Note>
+            return <Note key={`${stringIndex}-${noteIndex}`} noteModel={note} string={stringIndex} fret={noteIndex}></Note>
         })
     })
 

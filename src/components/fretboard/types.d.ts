@@ -12,6 +12,5 @@ declare module 'FretboardModels' {
       title: string;
       category?: string;
     };
-    
   
 }

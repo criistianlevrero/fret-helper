@@ -1,10 +1,37 @@
-import { Note  as NoteModel } from 'FretboardModels';
+import { connect } from 'react-redux';
 
-function Note(props:{noteModel: NoteModel, chord: number, fret: number}): JSX.Element {
-    
+import { Note  as NoteModel } from 'FretboardModels';
+import { NoteStatus } from '../../services/fretboard-utils';
+import { changeNoteStatus } from '../../store/actions';
+
+import noteStyles from './note.module.css'
+
+const dispatchProps = {
+    changeStatus: changeNoteStatus,
+};
+
+type DispatchType = typeof dispatchProps.changeStatus;
+
+function Note(props:{noteModel: NoteModel, string: number, fret: number, changeStatus:DispatchType}): JSX.Element {
+    const onNoteClick = () => {
+        const statusArray = Object.values(NoteStatus)
+        const statusIndex = statusArray.indexOf(props.noteModel.status)
+        const newStatus = statusArray[(statusIndex + 1) % statusArray.length]
+        console.log(newStatus, statusArray, props.noteModel.status)
+        props.changeStatus(props.string, props.fret, newStatus )
+    }
     return (
-        <div data-note={props.noteModel.pitch} data-status={props.noteModel.status}>{props.noteModel.name}</div>
+        <div
+            className={noteStyles.note}
+            data-note={props.noteModel.pitch}
+            data-status={props.noteModel.status}
+            onClick={onNoteClick}>
+                {props.noteModel.name}
+        </div>
     )
 }
 
-export default Note
+export default connect(
+    null,
+    dispatchProps
+  )(Note);

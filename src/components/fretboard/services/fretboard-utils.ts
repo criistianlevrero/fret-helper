@@ -1,4 +1,4 @@
-import { Note } from "FretboardModels";
+import { Note, } from "FretboardModels";
 
 enum NoteStatus {
   inactive = 'inactive',
@@ -80,11 +80,11 @@ const getFretboard = (): Note[][] => {
 }
 
 export {
-  getFretboard
+  getFretboard,
+  NoteStatus
 }
 
 export type {
-  NoteStatus,
   NoteNames,
   Intervals
 }

@@ -1,0 +1,12 @@
+.note {
+    @apply bg-stone-700 text-center py-2.5 text-xl border-r-8 border-slate-300 text-white
+    data-[status="root"]:text-orange-600
+    data-[status="interval"]:text-green-700
+    data-[status="marked"]:text-cyan-700
+    ;
+
+    &:nth-of-type(1),
+    &:nth-of-type(27n + 1) {
+        @apply bg-stone-900 border-double border-r-16;
+    }
+}

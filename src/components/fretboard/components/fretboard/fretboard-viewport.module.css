@@ -1,0 +1,3 @@
+.fretboard {
+  @apply grid grid-cols-27;
+}

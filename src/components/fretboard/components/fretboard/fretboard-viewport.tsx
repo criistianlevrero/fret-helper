@@ -1,4 +1,4 @@
-import './fretboard-viewport.css'
+import fretboardStyles from './fretboard-viewport.module.css'
 
 interface CardProps {
   children: React.ReactNode | React.ReactNode[];
@@ -7,7 +7,7 @@ interface CardProps {
 function FretboardViewport({ children }: CardProps): JSX.Element{
   return (
     <div className='m-20 h-80'>
-      <section className="fretboard grid grid-cols-27">
+      <section className={fretboardStyles.fretboard}>
           {children}
       </section>
     </div>
