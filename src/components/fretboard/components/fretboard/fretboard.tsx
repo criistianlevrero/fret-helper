@@ -5,6 +5,7 @@ import { connect } from "react-redux"
 import { RootState } from 'typesafe-actions';
 
 import * as selectors from '../../store/selectors';
+import { getFretboard} from '../../services/fretboard.service';
 
 const mapStateToProps = (state: RootState) => ({
     fretbardModel: selectors.getFretboard(state.fretboard),
@@ -15,21 +16,19 @@ type Props = ReturnType<typeof mapStateToProps>;
 function Fretboard({ fretbardModel }: Props) {
     
     const onButtonClick = () => {
-        console.log(fretbardModel)
+        console.log(getFretboard())
         //props.onUnload()
         //console.log(props.viewChangeCounter)
     }
 
-    const renderedNotes = fretbardModel.map((string:NoteModel[], stringIndex:number) => {
-        return string.map((note:NoteModel, noteIndex) => {
-            return <Note key={`${stringIndex}-${noteIndex}`} noteModel={note} string={stringIndex} fret={noteIndex}></Note>
-        })
+    const renderedNotes = fretbardModel.map((note:NoteModel, noteIndex:number) => {
+        return <Note key={noteIndex} noteModel={note} noteIndex={noteIndex}></Note>
     })
 
     return (
         <>
-            <header>{'props.viewChangeCounter'}</header>
-            <button onClick={onButtonClick}>sume</button>
+            <header>Frethelper</header>
+            <button onClick={onButtonClick}>log</button>
             <FretboardViewport>
                     { renderedNotes }
             </FretboardViewport>

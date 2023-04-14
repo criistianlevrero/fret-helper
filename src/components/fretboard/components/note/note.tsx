@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import { Note  as NoteModel } from 'FretboardModels';
-import { NoteStatus } from '../../services/fretboard-utils';
+import { NoteStatus } from '../../services/fretboard.service';
 import { changeNoteStatus } from '../../store/actions';
 
 import noteStyles from './note.module.css'
@@ -12,13 +12,13 @@ const dispatchProps = {
 
 type DispatchType = typeof dispatchProps.changeStatus;
 
-function Note(props:{noteModel: NoteModel, string: number, fret: number, changeStatus:DispatchType}): JSX.Element {
+function Note(props:{noteModel: NoteModel, noteIndex: number, changeStatus:DispatchType}): JSX.Element {
     const onNoteClick = () => {
         const statusArray = Object.values(NoteStatus)
         const statusIndex = statusArray.indexOf(props.noteModel.status)
         const newStatus = statusArray[(statusIndex + 1) % statusArray.length]
         console.log(newStatus, statusArray, props.noteModel.status)
-        props.changeStatus(props.string, props.fret, newStatus )
+        props.changeStatus(props.noteIndex, newStatus )
     }
     return (
         <div

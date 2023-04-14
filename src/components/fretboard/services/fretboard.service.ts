@@ -58,24 +58,24 @@ const fretsNumber = 27;
 const tuning = [64,59,55,50,45,40,]
 const midiNumberOffset = 21
 
-const createFretbord = () => {
+
+const createFretborda = ():Note[]  => {
   const chromaticNotes = Array.from(chromaticScale.values())
-  let fretboard: Note[][] = []
+  let fretboard:Note[] = []
   tuning.forEach((chordTuing: number) => {
-    let chord: Note[] = []
     for (var i = 0; i < fretsNumber; i++) {
       const noteIndex: number = (i+chordTuing-midiNumberOffset)%chromaticNotes.length
       const note:Note = { ...chromaticNotes[noteIndex], pitch : noteIndex + fretsNumber }
-      chord.push(note)
+      fretboard.push(note)
     }
-    fretboard.push(chord);
   });
   return fretboard;
 }
 
-const fretboard = createFretbord();
+const fretboard = createFretborda();
 
-const getFretboard = (): Note[][] => {
+const getFretboard = (): Note[] => {
+  console.log(fretboard)
   return fretboard
 }
 

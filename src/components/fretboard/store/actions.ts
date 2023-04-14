@@ -1,8 +1,7 @@
 import { createAction, createAsyncAction } from 'typesafe-actions';
-import { NoteStatus } from '../services/fretboard-utils';
+import { NoteStatus } from '../services/fretboard.service';
 
-export const changeNoteStatus = createAction('CHANGE_NOTE_STATUS', (string: number, fret:number, status: NoteStatus ) => ({
-    string,
-    fret,
+export const changeNoteStatus = createAction('CHANGE_NOTE_STATUS', (noteIndex: number, status: NoteStatus ) => ({
+    noteIndex,
     status
   }))();
