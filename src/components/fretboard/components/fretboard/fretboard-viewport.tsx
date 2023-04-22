@@ -6,7 +6,7 @@ interface CardProps {
 
 function FretboardViewport({ children }: CardProps): JSX.Element{
   return (
-    <div className='m-20 h-80'>
+    <div className='p-20 overflow-auto'>
       <section className={fretboardStyles.fretboard}>
           {children}
       </section>

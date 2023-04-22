@@ -1,8 +1,10 @@
+import {MouseEvent} from 'react';
 import { connect } from 'react-redux';
 
 import { Note  as NoteModel } from 'FretboardModels';
 import { NoteStatus } from '../../services/fretboard.service';
 import { changeNoteStatus } from '../../store/actions';
+import { ToolDispatcher } from '../tools'
 
 import noteStyles from './note.module.css'
 
@@ -13,11 +15,15 @@ const dispatchProps = {
 type DispatchType = typeof dispatchProps.changeStatus;
 
 function Note(props:{noteModel: NoteModel, noteIndex: number, changeStatus:DispatchType}): JSX.Element {
-    const onNoteClick = () => {
+
+    const onNoteClick = (event: MouseEvent) => {
+        event.preventDefault();
         const statusArray = Object.values(NoteStatus)
         const statusIndex = statusArray.indexOf(props.noteModel.status)
         const newStatus = statusArray[(statusIndex + 1) % statusArray.length]
+
         console.log(newStatus, statusArray, props.noteModel.status)
+        
         props.changeStatus(props.noteIndex, newStatus )
     }
     return (
@@ -26,7 +32,9 @@ function Note(props:{noteModel: NoteModel, noteIndex: number, changeStatus:Dispa
             data-note={props.noteModel.pitch}
             data-status={props.noteModel.status}
             onClick={onNoteClick}>
-                {props.noteModel.name}
+                <ToolDispatcher noteModel={props.noteModel}>
+                    {props.noteModel.name}
+                </ToolDispatcher>
         </div>
     )
 }
