@@ -1,8 +1,7 @@
 import {MouseEvent} from 'react';
 import { connect } from 'react-redux';
 
-import { Note  as NoteModel } from 'FretboardModels';
-import { NoteStatus } from '../../services/fretboard.service';
+import { Note  as NoteModel, NoteStatus } from '../../models';
 import { changeNoteStatus } from '../../store/actions';
 import { ToolDispatcher } from '../tools'
 
