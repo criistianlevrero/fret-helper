@@ -1,5 +1,6 @@
-import { combineEpics } from 'redux-observable';
+import { combineEpics, Epic } from 'redux-observable';
+import { RootAction, RootState, Services } from 'typesafe-actions';
 
-import * as todosEpics from '../components/todos/store/epics';
+const rootEpic: Epic<RootAction, RootAction, RootState, Services> = combineEpics();
 
-export default combineEpics(...Object.values(todosEpics));
+export default rootEpic;
