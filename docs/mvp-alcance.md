@@ -11,7 +11,7 @@ Este documento se va completando **feature por feature**, a medida que las discu
 | 1 | Pintar escalas y acordes en el diapasón | 🟡 borrador, a confirmar |
 | 2 | Base de datos de escalas y acordes | 🔲 por discutir (comparte modelo con #1, ver abajo) |
 | 3 | Identificar acordes a partir del dibujo del usuario | 🔲 por discutir (comparte modelo con #1, ver abajo) |
-| 4 | Relacionar acordes entre sí (tipos de relación a definir) | 🔲 por discutir |
+| 4 | Relacionar acordes y escalas entre sí (tipos de relación a definir) | 🟡 borrador, a confirmar |
 | 5 | Cálculo de digitación (qué dedo toca cada nota de un acorde) | 🔲 documentada, prioridad baja — se retoma más adelante |
 
 ---
@@ -27,7 +27,7 @@ Modelo compartido con las features 2 y 3 (base de datos y reconocimiento): una e
   - **Modo libre**: el usuario pinta notas sueltas sin ninguna escala/acorde de base (lo que vos describías como "solo notas sueltas sin relación").
   - **Agregado sobre una estructura**: una nota de color que no pertenece a la fórmula de lo ya pintado.
 - Click sobre una nota ya pintada (root/interval/marked) la vuelve a `inactive`.
-- **Raíz vs. tonalidad**: la raíz del acorde/escala (ej. el Do de "Do mayor") es intrínseca y va en el modelo de arriba. La tonalidad como *contexto funcional* (ese mismo acorde funcionando como grado V de otra escala) no es un campo fijo — es una relación (ver feature 4), porque el mismo acorde puede tener varias funciones según el contexto y no queremos duplicar el dato. **Pendiente de confirmar con el usuario** si esto cubre lo que pedía o si "tonalidad" apuntaba a otra cosa (ej. una tonalidad general de sesión/proyecto).
+- **Raíz vs. tonalidad (confirmado)**: la raíz del acorde/escala (ej. el Do de "Do mayor") es intrínseca y va en el modelo de arriba. La tonalidad como *contexto funcional* (ese mismo acorde funcionando como grado V de otra escala) no es un campo fijo — es una relación calculada (ver feature 4), no una que se guarde ni se elija por acorde. Así un mismo acorde puede ser función X de la tonalidad Y y función V de la tonalidad Z al mismo tiempo, sin duplicar datos ni vincular nada a mano.
 - Dos caminos para llegar a un diapasón pintado, que conviven entre sí:
   - **Desde la base de datos**: se elige una escala/acorde del catálogo → se pintan automáticamente sus notas como root/interval.
   - **A mano / dibujando**: se clickean notas sueltas (quedan `marked`) → dispara reconocimiento (feature 3) → la app sugiere raíz + nombre(s) candidatos → al confirmar uno, esas notas pasan a root/interval.
@@ -46,9 +46,34 @@ Usa el mismo modelo de raíz + fórmula de intervalos definido en la feature 1 �
 
 Toma un conjunto de notas `marked` (sin raíz asignada) y busca la mejor raíz + fórmula candidata contra la base de datos de la feature 2, para alimentar la sugerencia de nombre de la feature 1. Resto del alcance (cómo se decide la raíz cuando hay ambigüedad, qué pasa si no matchea nada): *(pendiente de discusión)*.
 
-## 4. Relaciones entre acordes
+## 4. Relaciones entre acordes y escalas
 
-*(pendiente de discusión)*
+Extiende el mismo modelo de raíz + fórmula: como una escala y un acorde son la misma cosa a nivel de datos (raíz + conjunto de intervalos, solo cambia si se los usa como `type: 'scale'` o `'chord'`), las reglas de relación se definen **genéricamente entre dos entidades raíz+fórmula**, sin importar si son escala↔escala, acorde↔acorde o acorde↔escala. Eso da gratis cosas como "esta escala contiene a este acorde" (es el mismo cálculo que "este acorde es subconjunto de este otro acorde").
+
+Ninguna relación se guarda como vínculo fijo entre dos entidades del catálogo. Se calculan al vuelo, bajo demanda, corriendo las reglas de abajo contra el catálogo entero (o contra una entidad puntual). "Buscar acordes/escalas relacionados" es entonces: tomar una entidad, correrle todas las reglas contra el resto del catálogo, y devolver los resultados agrupados por tipo de relación — sin elegir tonalidad de antemano.
+
+**Catálogo de reglas — lista inicial (MVP):**
+
+Reglas puramente matemáticas sobre los dos conjuntos de notas, sin curaduría de teoría adicional:
+
+1. **Transposición** — misma fórmula, raíz distinta (C7 ↔ D7).
+2. **Modo / rotación** — mismo conjunto de notas, tomando otra nota como raíz. Generaliza "relativa mayor/menor" a cualquier fórmula (la menor natural es el modo eólico de la mayor — un caso particular de esta regla, no hace falta una regla aparte) y también cubre inversiones de acorde (mismas notas, otro bajo).
+3. **Subconjunto / superconjunto** — las notas de A están contenidas en B, o viceversa (C ⊂ Cmaj7 ⊂ escala mayor de Do).
+4. **Complemento** — cuando A ⊆ B, qué notas le faltan a A para llegar a B (útil para "qué le agrego a este acorde para llegar a tal escala/extensión").
+5. **Notas compartidas / similaridad** — cuántas notas tienen en común dos entidades cualesquiera, aunque ninguna sea subconjunto exacto de la otra (sirve para sugerir sustitutos o "cosas que suenan parecido").
+6. **Función tonal** — ¿la raíz de A cae en el grado N de alguna escala B del catálogo, y las notas de A matchean (aprox.) el acorde diatónico de ese grado? Se evalúa contra *todas* las escalas del catálogo, no contra una fija, así devuelve varios pares (tonalidad, grado) por entidad.
+
+**Lista extendida (futuro probable, requieren más curaduría teórica o son más específicas):**
+
+- **Paralela con cualidad explícita** — misma raíz, cambia solo la 3ª y/o la 7ª (mayor↔menor, dom7↔m7, etc.) como caso nombrado y con nombre propio, más allá de lo que ya cubre "notas compartidas".
+- **Sustitución tritonal** — para dominantes: acorde con raíz a distancia de tritono que comparte 3ª/7ª (invertidas).
+- **Dominante secundario / II–V relativo** — relaciones de progresión, no solo de pares (requiere pensar secuencias, no solo relaciones binarias — puede que ni siquiera entre en este sistema de "relaciones entre dos entidades" y termine siendo otra feature).
+- **Distancia armónica por círculo de quintas** — qué tan "cerca" están dos raíces en el círculo de quintas, como métrica de afinidad.
+- **Sustituciones por tensión** — variantes que comparten función pero agregan/sacan tensiones (V7, V7b9, V7#5) — probablemente un caso más específico de "notas compartidas" con un umbral alto.
+
+**Abierto:**
+- Para la regla de "notas compartidas", ¿hace falta un umbral mínimo (ej. al menos 2 notas en común) para que valga la pena mostrarlo como relación, o se muestra todo con su score y se ordena?
+- ¿El resultado de "función tonal" se limita a escalas de 7 notas (tonalidades clásicas) o también corre contra escalas de la base en general (pentatónicas, modos, etc.), aunque el concepto de "grado" sea menos estándar ahí?
 
 ## 5. Cálculo de digitación (fingers)
 
