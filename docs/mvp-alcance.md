@@ -40,7 +40,18 @@ Modelo compartido con las features 2 y 3 (base de datos y reconocimiento): una e
 
 ## 2. Base de datos de escalas y acordes
 
-Usa el mismo modelo de raíz + fórmula de intervalos definido en la feature 1 — el catálogo es, en esencia, una lista de fórmulas con nombre (ej. "mayor" = P1,M2,M3,P4,P5,M6,M7; "m7" = P1,m3,P5,m7), combinables con cualquier raíz para pintar. Resto del alcance: *(pendiente de discusión)*.
+Usa el mismo modelo de raíz + fórmula de intervalos definido en la feature 1 — el catálogo es, en esencia, una lista de fórmulas con nombre (ej. "Mayor" = P1,M2,M3,P4,P5,M6,M7; "m7" = P1,m3,P5,m7), combinables con cualquier raíz para pintar.
+
+**Borrador (a confirmar):**
+
+- **Rango de intervalos**: el enum `Intervals` actual llega a `P8` (una octava). Se extiende con 9na/11na/13na (para acordes extendidos tipo jazz/funk) como valores nominales — importa el nombre para el usuario (`add9` ≠ `sus2` aunque agreguen la misma nota) — pero el cálculo de a qué traste corresponde siempre normaliza a semitonos módulo 12 por debajo.
+- **Catálogo vs. guardado del usuario**: dos colecciones separadas. El catálogo de esta feature es contenido curado por la app — fórmulas *sin raíz*, reusables ("Mayor", "m7"). Lo que el usuario guarda (feature 1) es una instancia concreta con raíz ya aplicada y nombre propio; no vuelve automáticamente a aparecer como fórmula reusable del catálogo para MVP (eso queda para v2, como "promover a fórmula propia").
+- **Persistencia**: sin backend hoy, todo vive en memoria del store y se pierde al refrescar. Para MVP, `localStorage` alcanza para que lo guardado sobreviva entre sesiones; backend real (sync entre dispositivos) queda para más adelante.
+- **Alias**: cada fórmula tiene un nombre principal + lista de alias (ej. una misma fórmula puede llamarse "6" o "m7" según cómo se la mire) — necesario para que la búsqueda y el reconocimiento (feature 3) encuentren lo que el usuario espera ante nombres ambiguos.
+
+**Abierto:**
+- Contenido semilla: ¿arranca con una lista razonable armada por el asistente (escalas: mayor, menor natural/armónica/melódica, modos griegos, pentatónicas, blues; acordes: tríadas + séptimas comunes + sus2/sus4/add9) para revisar, o hay fórmulas puntuales que el usuario quiere sí o sí desde el arranque?
+- ¿El catálogo es fijo (solo lo agrega/edita quien mantiene la app) o el usuario puede agregar sus propias fórmulas nombradas desde la UI en el MVP?
 
 ## 3. Identificación de acordes por dibujo
 
