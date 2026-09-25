@@ -9,7 +9,7 @@ Este documento se va completando **feature por feature**, a medida que las discu
 | # | Feature | Estado |
 |---|---|---|
 | 1 | Pintar escalas y acordes en el diapasón | 🟡 borrador, a confirmar |
-| 2 | Base de datos de escalas y acordes | 🟡 borrador, a confirmar |
+| 2 | Base de datos de escalas y acordes | 🟢 cerrada para MVP |
 | 3 | Identificar acordes a partir del dibujo del usuario | 🔲 por discutir (comparte modelo con #1, ver abajo) |
 | 4 | Relacionar acordes y escalas entre sí (tipos de relación a definir) | 🟡 borrador, a confirmar |
 | 5 | Cálculo de digitación (qué dedo toca cada nota de un acorde) | 🔲 documentada, prioridad baja — se retoma más adelante |
@@ -85,8 +85,7 @@ Usa el mismo modelo de raíz + fórmula de intervalos definido en la feature 1 �
 | m6 | P1 m3 P5 M6 |
 | add9 | P1 M3 P5 M9 |
 
-**Abierto:**
-- ¿El catálogo es fijo (solo lo agrega/edita quien mantiene la app) o el usuario puede agregar sus propias fórmulas nombradas desde la UI en el MVP?
+- **Catálogo fijo (confirmado)**: para el MVP el catálogo es contenido curado, no editable desde la UI. Fórmulas propias del usuario quedan para el futuro.
 
 ## 3. Identificación de acordes por dibujo
 
