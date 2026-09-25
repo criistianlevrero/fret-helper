@@ -9,7 +9,7 @@ Este documento se va completando **feature por feature**, a medida que las discu
 | # | Feature | Estado |
 |---|---|---|
 | 1 | Pintar escalas y acordes en el diapasón | 🟡 borrador, a confirmar |
-| 2 | Base de datos de escalas y acordes | 🔲 por discutir (comparte modelo con #1, ver abajo) |
+| 2 | Base de datos de escalas y acordes | 🟡 borrador, a confirmar |
 | 3 | Identificar acordes a partir del dibujo del usuario | 🔲 por discutir (comparte modelo con #1, ver abajo) |
 | 4 | Relacionar acordes y escalas entre sí (tipos de relación a definir) | 🟡 borrador, a confirmar |
 | 5 | Cálculo de digitación (qué dedo toca cada nota de un acorde) | 🔲 documentada, prioridad baja — se retoma más adelante |
@@ -44,13 +44,48 @@ Usa el mismo modelo de raíz + fórmula de intervalos definido en la feature 1 �
 
 **Borrador (a confirmar):**
 
-- **Rango de intervalos**: el enum `Intervals` actual llega a `P8` (una octava). Se extiende con 9na/11na/13na (para acordes extendidos tipo jazz/funk) como valores nominales — importa el nombre para el usuario (`add9` ≠ `sus2` aunque agreguen la misma nota) — pero el cálculo de a qué traste corresponde siempre normaliza a semitonos módulo 12 por debajo.
-- **Catálogo vs. guardado del usuario**: dos colecciones separadas. El catálogo de esta feature es contenido curado por la app — fórmulas *sin raíz*, reusables ("Mayor", "m7"). Lo que el usuario guarda (feature 1) es una instancia concreta con raíz ya aplicada y nombre propio; no vuelve automáticamente a aparecer como fórmula reusable del catálogo para MVP (eso queda para v2, como "promover a fórmula propia").
-- **Persistencia**: sin backend hoy, todo vive en memoria del store y se pierde al refrescar. Para MVP, `localStorage` alcanza para que lo guardado sobreviva entre sesiones; backend real (sync entre dispositivos) queda para más adelante.
+- **Rango de intervalos (confirmado)**: el enum `Intervals` actual llega a `P8` (una octava). Se extiende con 9na/11na/13na (para acordes extendidos tipo jazz/funk) como valores nominales — importa el nombre para el usuario (`add9` ≠ `sus2` aunque agreguen la misma nota) — pero el cálculo de a qué traste corresponde siempre normaliza a semitonos módulo 12 por debajo.
+  - **Simplificación consciente**: el enum no distingue enarmónicos — una 4ta aumentada (Lidio) y una 5ta disminuida (Locrio) caen en el mismo semitono y comparten nombre canónico único. Teóricamente no siempre es el nombre "correcto", pero mantiene el enum chico. Si en algún momento importa mostrar el nombre enarmónico correcto por contexto, es un cambio localizado (agregar el spelling alternativo), no un rediseño.
+- **Catálogo vs. guardado del usuario (confirmado)**: dos colecciones separadas. El catálogo de esta feature es contenido curado por la app — fórmulas *sin raíz*, reusables ("Mayor", "m7"). Lo que el usuario guarda (feature 1) es una instancia concreta con raíz ya aplicada y nombre propio; no vuelve automáticamente a aparecer como fórmula reusable del catálogo para MVP (eso queda para v2, como "promover a fórmula propia").
+- **Persistencia (confirmado)**: `localStorage` para MVP (sin backend hoy, todo vive en memoria del store y se pierde al refrescar). Se descarta event sourcing para esto — un log de eventos paga cuando hay múltiples editores concurrentes sobre el mismo dato o hace falta auditoría/undo real; acá es un catálogo personal sin edición concurrente. En su lugar, cada entidad guardada lleva `id` + `updatedAt` (o versión) + tombstone de borrado (en vez de borrado físico), lo que alcanza para un sync *last-write-wins* por `id` cuando exista un backend, sin necesitar reconstruir estado reproduciendo un historial de acciones.
 - **Alias**: cada fórmula tiene un nombre principal + lista de alias (ej. una misma fórmula puede llamarse "6" o "m7" según cómo se la mire) — necesario para que la búsqueda y el reconocimiento (feature 3) encuentren lo que el usuario espera ante nombres ambiguos.
 
+**Contenido semilla (borrador, a revisar):**
+
+| Escalas | Fórmula |
+|---|---|
+| Mayor (Jónico) | P1 M2 M3 P4 P5 M6 M7 |
+| Menor natural (Eólico) | P1 M2 m3 P4 P5 m6 m7 |
+| Menor armónica | P1 M2 m3 P4 P5 m6 M7 |
+| Menor melódica | P1 M2 m3 P4 P5 M6 M7 |
+| Dórico | P1 M2 m3 P4 P5 M6 m7 |
+| Frigio | P1 m2 m3 P4 P5 m6 m7 |
+| Lidio | P1 M2 M3 d5 P5 M6 M7 |
+| Mixolidio | P1 M2 M3 P4 P5 M6 m7 |
+| Locrio | P1 m2 m3 P4 d5 m6 m7 |
+| Pentatónica mayor | P1 M2 M3 P5 M6 |
+| Pentatónica menor | P1 m3 P4 P5 m7 |
+| Blues | P1 m3 P4 d5 P5 m7 |
+
+| Acordes | Fórmula |
+|---|---|
+| Mayor | P1 M3 P5 |
+| Menor | P1 m3 P5 |
+| Disminuida | P1 m3 d5 |
+| Aumentada | P1 M3 m6 |
+| Sus2 | P1 M2 P5 |
+| Sus4 | P1 P4 P5 |
+| Maj7 | P1 M3 P5 M7 |
+| 7 (dominante) | P1 M3 P5 m7 |
+| m7 | P1 m3 P5 m7 |
+| m7♭5 (semidisminuido) | P1 m3 d5 m7 |
+| dim7 | P1 m3 d5 M6 |
+| mMaj7 | P1 m3 P5 M7 |
+| 6 | P1 M3 P5 M6 |
+| m6 | P1 m3 P5 M6 |
+| add9 | P1 M3 P5 M9 |
+
 **Abierto:**
-- Contenido semilla: ¿arranca con una lista razonable armada por el asistente (escalas: mayor, menor natural/armónica/melódica, modos griegos, pentatónicas, blues; acordes: tríadas + séptimas comunes + sus2/sus4/add9) para revisar, o hay fórmulas puntuales que el usuario quiere sí o sí desde el arranque?
 - ¿El catálogo es fijo (solo lo agrega/edita quien mantiene la app) o el usuario puede agregar sus propias fórmulas nombradas desde la UI en el MVP?
 
 ## 3. Identificación de acordes por dibujo
