@@ -1,6 +1,6 @@
 # Fret Helper — Alcance del MVP
 
-Visión general (2026-09-23): una app que ayuda a pintar escalas y acordes en el diapasón de la guitarra, con una base de datos de escalas y acordes, que puede identificar acordes a partir del dibujo del usuario sobre el mástil, y que permite relacionar acordes entre sí por distintos tipos de relación.
+Visión general (actualizado 2026-09-26): un *helper* para guitarristas — no una base de datos estática para consultar, sino una herramienta activa para **encontrar y construir** posiciones de acordes y escalas en el diapasón, combinarlos entre sí, e identificar lo que uno mismo dibuja. Pinta escalas y acordes en el diapasón, tiene una base de datos de escalas y acordes, puede identificar acordes a partir del dibujo del usuario sobre el mástil (incluyendo qué inversión/voicing concreto quedó armado), y permite relacionar acordes y escalas entre sí por distintos tipos de relación libres de tonalidad.
 
 Este documento se va completando **feature por feature**, a medida que las discutimos. Cada sección queda con: alcance decidido para el MVP, lo que queda afuera (v2+), y preguntas abiertas. La implementación se planifica en una instancia aparte, una vez cerrado el alcance.
 
@@ -8,9 +8,9 @@ Este documento se va completando **feature por feature**, a medida que las discu
 
 | # | Feature | Estado |
 |---|---|---|
-| 1 | Pintar escalas y acordes en el diapasón | 🟡 borrador, a confirmar |
+| 1 | Pintar escalas y acordes, y elegir posiciones/voicings tocables (1.1) | 🟡 borrador, a confirmar |
 | 2 | Base de datos de escalas y acordes | 🟢 cerrada para MVP |
-| 3 | Identificar acordes a partir del dibujo del usuario | 🔲 por discutir (comparte modelo con #1, ver abajo) |
+| 3 | Identificar acordes a partir del dibujo del usuario (incluye qué inversión/voicing quedó armado) | 🔲 por discutir (comparte modelo con #1, ver abajo) |
 | 4 | Relacionar acordes y escalas entre sí (tipos de relación a definir) | 🟡 borrador, a confirmar |
 | 5 | Cálculo de digitación (qué dedo toca cada nota de un acorde) | 🔲 documentada, prioridad baja — se retoma más adelante |
 
@@ -31,12 +31,26 @@ Modelo compartido con las features 2 y 3 (base de datos y reconocimiento): una e
 - Dos caminos para llegar a un diapasón pintado, que conviven entre sí:
   - **Desde la base de datos**: se elige una escala/acorde del catálogo → se pintan automáticamente sus notas como root/interval.
   - **A mano / dibujando**: se clickean notas sueltas (quedan `marked`) → dispara reconocimiento (feature 3) → la app sugiere raíz + nombre(s) candidatos → al confirmar uno, esas notas pasan a root/interval.
-- **Guardado y nombre**: al guardar, la app sugiere un nombre automático (salida del reconocimiento — ej. "Do mayor", "Re m7" — o algo genérico si no matchea nada conocido) y el usuario lo puede editar, antes o después de guardar. Reutiliza `FretboardConfig` (`id`, `title`, hoy sin uso), que habría que extender con algo como `root`, `formula`, `type`.
+- **Guardado y nombre**: al guardar, la app sugiere un nombre automático (salida del reconocimiento — ej. "Do mayor", "Re m7" — o algo genérico si no matchea nada conocido) y el usuario lo puede editar, antes o después de guardar. Reutiliza `FretboardConfig` (`id`, `title`, hoy sin uso), que habría que extender con algo como `root`, `formula`, `type`, y `positions` (ver 1.1).
 
 **Abierto:**
 - ¿Qué pasa si el conjunto pintado matchea varios nombres posibles (ambigüedad, ej. mismas notas = C6 y Am7)? ¿Se muestran varias sugerencias o se elige una por defecto?
 - ¿El nombre autogenerado se recalcula si se sigue clickeando después de guardar, o queda fijo una vez que el usuario le puso nombre propio?
 - ¿"Guardar" siempre crea algo nuevo, o también se puede sobrescribir/editar algo ya guardado?
+
+### 1.1 Selección de posiciones (voicings) — el corazón del "helper"
+
+Reencuadre clave (confirmado con el usuario): la app no es una base de datos de acordes para consultar, es una herramienta para **encontrar y construir posiciones tocables**. Pintar una fórmula desde la base de datos marca *todas* las ocurrencias de cada nota en las 27 trastes × 6 cuerdas — eso es el punto de partida, no el resultado final. Una **posición** (voicing) es un subconjunto concreto y tocable de esas ocurrencias.
+
+Lo que hace tocable a una posición: como mucho una nota por cuerda, y todas las notas (salvo cuerdas al aire) dentro de una ventana de trastes acotada por el **alcance de mano** del usuario.
+
+La inversión y el tipo de voicing (root position, 1ra/2da/3ra inversión, drop 2, drop 3, etc.) no se eligen de una lista — **se detectan** a partir de qué posición concreta se armó: mirando qué nota de la fórmula quedó más grave (la del bajo) y, para voicings de 4+ notas, comparando el orden de notas resultante contra el orden "cerrado" esperado. El detalle exacto del algoritmo de detección queda para la instancia de implementación; acá solo se fija que es una detección automática, no una entrada manual del usuario.
+
+**Confirmado:**
+
+- **Alcance de mano configurable**: es una preferencia del usuario (no un valor fijo tipo "4 trastes"), porque depende de la destreza y de cuánto se anima a abrir los dedos. Para el MVP, sin sugerencia automática todavía, este valor se usa como validación/aviso mientras se selecciona a mano (ej. avisar si la posición elegida excede el alcance configurado), no como filtro de una lista generada.
+- **Alcance del MVP**: selección **manual** de la posición (clickeando sobre el pintado completo cuál ocurrencia de cada nota usar) + detección automática de qué inversión/voicing resultó. La **sugerencia automática** de posiciones posibles (explorar combinaciones válidas y ofrecerlas, tipo "acá tenés 5 formas de tocar esto") queda para una versión futura.
+- **Guardado anidado**: una posición guardada es una variante del acorde/escala guardado, no una entidad independiente — jerarquía de dos niveles: el acorde/escala (raíz + fórmula + nombre) tiene 0+ posiciones guardadas debajo (cada una con sus notas concretas por cuerda/traste, y la inversión/voicing detectada).
 
 ## 2. Base de datos de escalas y acordes
 
