@@ -10,7 +10,7 @@ Este documento se va completando **feature por feature**, a medida que las discu
 |---|---|---|
 | 1 | Pintar escalas y acordes, y elegir posiciones/voicings tocables (1.1) | 🟡 borrador, a confirmar |
 | 2 | Base de datos de escalas y acordes | 🟢 cerrada para MVP |
-| 3 | Identificar acordes a partir del dibujo del usuario (incluye qué inversión/voicing quedó armado) | 🔲 por discutir (comparte modelo con #1, ver abajo) |
+| 3 | Identificar acordes a partir del dibujo del usuario (incluye qué inversión/voicing quedó armado) | 🟢 cerrada para MVP |
 | 4 | Relacionar acordes y escalas entre sí (tipos de relación a definir) | 🟡 borrador, a confirmar |
 | 5 | Cálculo de digitación (qué dedo toca cada nota de un acorde) | 🔲 documentada, prioridad baja — se retoma más adelante |
 
@@ -103,7 +103,14 @@ Usa el mismo modelo de raíz + fórmula de intervalos definido en la feature 1 �
 
 ## 3. Identificación de acordes por dibujo
 
-Toma un conjunto de notas `marked` (sin raíz asignada) y busca la mejor raíz + fórmula candidata contra la base de datos de la feature 2, para alimentar la sugerencia de nombre de la feature 1. Resto del alcance (cómo se decide la raíz cuando hay ambigüedad, qué pasa si no matchea nada): *(pendiente de discusión)*.
+Toma un conjunto de notas `marked` (sin raíz asignada) y busca la mejor raíz + fórmula candidata contra la base de datos de la feature 2, para alimentar la sugerencia de nombre de la feature 1. La búsqueda corre contra **todo el catálogo** (escalas y acordes), no solo acordes — el `type` de la fórmula matcheada define si se etiqueta como "escala" o "acorde". El cálculo de qué tan bien matchea reutiliza la regla de "notas compartidas/subconjunto" de la feature 4: es la misma cuenta, probando cada nota marcada como raíz candidata contra cada fórmula del catálogo.
+
+**Confirmado:**
+
+- **Normalización de entrada**: lo marcado se reduce a un conjunto de notas únicas (clases de altura) antes de comparar contra una fórmula, ignorando en qué cuerda/traste concreto está cada una.
+- **La nota de bajo no se ignora**: cuando varias fórmulas matchean igual de bien sobre el mismo conjunto de notas (ambigüedad, ej. C6 vs Am7), se prioriza como raíz la que coincide con la nota más grave de lo marcado — no es una regla dura que descarta las demás opciones, es un criterio de orden entre las sugerencias. Este mismo dato (qué nota quedó de bajo) es el que alimenta la detección de inversión/voicing de la posición elegida (feature 1.1) una vez que el usuario fija una posición concreta: mismo concepto, dos usos — desambiguar el nombre sugerido, y clasificar el voicing resultante.
+- **Cuándo corre**: en vivo, cada vez que se agrega una marca (al hacer click). Queda anotado como decisión de interfaz, no de arquitectura: si resulta lento con el catálogo completo, se puede mover detrás de un botón explícito sin cambiar el modelo de cómputo.
+- **Sin match**: si nada del catálogo matchea ni parcialmente por encima de un umbral razonable, no se sugiere nombre — vale el fallback ya definido en la feature 1 ("Acorde personalizado" / listar las notas). El umbral exacto se ajusta en la instancia de implementación.
 
 ## 4. Relaciones entre acordes y escalas
 
