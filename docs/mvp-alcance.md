@@ -31,12 +31,7 @@ Modelo compartido con las features 2 y 3 (base de datos y reconocimiento): una e
 - Dos caminos para llegar a un diapasón pintado, que conviven entre sí:
   - **Desde la base de datos**: se elige una escala/acorde del catálogo → se pintan automáticamente sus notas como root/interval.
   - **A mano / dibujando**: se clickean notas sueltas (quedan `marked`) → dispara reconocimiento (feature 3) → la app sugiere raíz + nombre(s) candidatos → al confirmar uno, esas notas pasan a root/interval.
-- **Guardado y nombre**: al guardar, la app sugiere un nombre automático (salida del reconocimiento — ej. "Do mayor", "Re m7" — o algo genérico si no matchea nada conocido) y el usuario lo puede editar, antes o después de guardar. Reutiliza `FretboardConfig` (`id`, `title`, hoy sin uso), que habría que extender con algo como `root`, `formula`, `type`, y `positions` (ver 1.1).
-
-**Abierto:**
-- ¿Qué pasa si el conjunto pintado matchea varios nombres posibles (ambigüedad, ej. mismas notas = C6 y Am7)? ¿Se muestran varias sugerencias o se elige una por defecto?
-- ¿El nombre autogenerado se recalcula si se sigue clickeando después de guardar, o queda fijo una vez que el usuario le puso nombre propio?
-- ¿"Guardar" siempre crea algo nuevo, o también se puede sobrescribir/editar algo ya guardado?
+- **Guardado y nombre**: al guardar una entrada de acorde/escala, la app sugiere un nombre automático (salida del reconocimiento — ej. "Do mayor", "Re m7" — o algo genérico si no matchea nada conocido). Detalle completo de la lógica de guardado/nombrado y de la jerarquía de persistencia en 1.2.
 
 ### 1.1 Selección de posiciones (voicings) — el corazón del "helper"
 
@@ -50,7 +45,27 @@ La inversión y el tipo de voicing (root position, 1ra/2da/3ra inversión, drop 
 
 - **Alcance de mano configurable**: es una preferencia del usuario (no un valor fijo tipo "4 trastes"), porque depende de la destreza y de cuánto se anima a abrir los dedos. Para el MVP, sin sugerencia automática todavía, este valor se usa como validación/aviso mientras se selecciona a mano (ej. avisar si la posición elegida excede el alcance configurado), no como filtro de una lista generada.
 - **Alcance del MVP**: selección **manual** de la posición (clickeando sobre el pintado completo cuál ocurrencia de cada nota usar) + detección automática de qué inversión/voicing resultó. La **sugerencia automática** de posiciones posibles (explorar combinaciones válidas y ofrecerlas, tipo "acá tenés 5 formas de tocar esto") queda para una versión futura.
-- **Guardado anidado**: una posición guardada es una variante del acorde/escala guardado, no una entidad independiente — jerarquía de dos niveles: el acorde/escala (raíz + fórmula + nombre) tiene 0+ posiciones guardadas debajo (cada una con sus notas concretas por cuerda/traste, y la inversión/voicing detectada).
+- **Guardado anidado**: una posición guardada es una variante del acorde/escala guardado, no una entidad independiente. Es el tercer nivel de la jerarquía de persistencia (ver 1.2): Sesión → Acorde/Escala → Posición.
+
+### 1.2 Sesiones y jerarquía de guardado
+
+Reencuadre (confirmado con el usuario): no se guardan acordes/escalas sueltos, se guardan **sesiones**. Una sesión es un conjunto de entradas de acorde/escala — relacionadas entre sí o no — que se guarda, se nombra y se recupera como un todo. Es la unidad que el usuario "trae de vuelta".
+
+**Importante — esto es una jerarquía de datos, no un diseño de interfaz.** El usuario la describió en términos de "pestañas" para explicar la idea, pero se documenta deliberadamente sin ese concepto: cómo se presenta (lista, tabs, lo que sea) es una decisión de la instancia de implementación, libre de cualquier supuesto hecho acá.
+
+Jerarquía de tres niveles:
+
+1. **Sesión** — `{ id, name, updatedAt, entradas: Entrada[] }`. El nombre lo elige el usuario desde que la crea, **sin autonombrado** (no hay reconocimiento posible de una colección de acordes potencialmente no relacionados entre sí).
+2. **Entrada (acorde o escala)** — `{ id, type, root, formula, name, updatedAt, posiciones: Posición[] }`. Una sesión tiene una o más. Mismo comportamiento de nombre que se había planteado para "guardado" en general, pero aplicado a este nivel: mientras se arma desde cero, el nombre sugerido se recalcula en vivo (igual que el reconocimiento); al guardarse queda fijo (no se recalcula solo); editable a mano en cualquier momento.
+3. **Posición (voicing)** — de la sección 1.1, sin cambios: notas concretas por cuerda/traste + inversión/voicing detectada.
+
+**Guardar vs. duplicar, en ambos niveles (sesión y entrada):**
+- Guardar sobre algo cargado desde un guardado existente **actualiza ese mismo registro** (mismo `id`, nuevo `updatedAt`) — nunca pide renombrar ni crea uno nuevo por las suyas.
+- **Duplicar** bifurca: crea una copia nueva (nuevo `id`) y se sigue trabajando ahí sin tocar el original. A nivel entrada, la copia queda como una entrada más dentro de la misma sesión.
+- Arrancar desde cero (sin nada cargado) y guardar siempre crea algo nuevo, porque no hay nada que sobrescribir.
+
+**Abierto:**
+- ¿"Duplicar" también aplica a nivel sesión completa (bifurcar todas sus entradas de una), o para el MVP alcanza con duplicar a nivel entrada?
 
 ## 2. Base de datos de escalas y acordes
 
