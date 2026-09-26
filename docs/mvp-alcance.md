@@ -8,7 +8,7 @@ Este documento se va completando **feature por feature**, a medida que las discu
 
 | # | Feature | Estado |
 |---|---|---|
-| 1 | Pintar escalas y acordes, y elegir posiciones/voicings tocables (1.1) | 🟡 borrador, a confirmar |
+| 1 | Pintar escalas y acordes, elegir posiciones/voicings tocables (1.1) y guardarlos en sesiones (1.2) | 🟢 cerrada para MVP |
 | 2 | Base de datos de escalas y acordes | 🟢 cerrada para MVP |
 | 3 | Identificar acordes a partir del dibujo del usuario (incluye qué inversión/voicing quedó armado) | 🟢 cerrada para MVP |
 | 4 | Relacionar acordes y escalas entre sí (tipos de relación a definir) | 🟡 borrador, a confirmar |
@@ -63,9 +63,7 @@ Jerarquía de tres niveles:
 - Guardar sobre algo cargado desde un guardado existente **actualiza ese mismo registro** (mismo `id`, nuevo `updatedAt`) — nunca pide renombrar ni crea uno nuevo por las suyas.
 - **Duplicar** bifurca: crea una copia nueva (nuevo `id`) y se sigue trabajando ahí sin tocar el original. A nivel entrada, la copia queda como una entrada más dentro de la misma sesión.
 - Arrancar desde cero (sin nada cargado) y guardar siempre crea algo nuevo, porque no hay nada que sobrescribir.
-
-**Abierto:**
-- ¿"Duplicar" también aplica a nivel sesión completa (bifurcar todas sus entradas de una), o para el MVP alcanza con duplicar a nivel entrada?
+- **Duplicar a nivel sesión (confirmado)**: mismo comportamiento que "guardar como" — bifurca la sesión completa (nuevo `id`, copia de todas sus entradas y posiciones) y se sigue trabajando sobre la copia; el original queda intacto tal cual estaba en el momento de duplicar.
 
 ## 2. Base de datos de escalas y acordes
 
