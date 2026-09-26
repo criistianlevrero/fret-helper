@@ -11,7 +11,7 @@ Este documento se va completando **feature por feature**, a medida que las discu
 | 1 | Pintar escalas y acordes, elegir posiciones/voicings tocables (1.1) y guardarlos en sesiones (1.2) | 🟢 cerrada para MVP |
 | 2 | Base de datos de escalas y acordes | 🟢 cerrada para MVP |
 | 3 | Identificar acordes a partir del dibujo del usuario (incluye qué inversión/voicing quedó armado) | 🟢 cerrada para MVP |
-| 4 | Relacionar acordes y escalas entre sí (tipos de relación a definir) | 🟡 borrador, a confirmar |
+| 4 | Relacionar acordes y escalas entre sí (tipos de relación a definir) | 🟢 cerrada para MVP |
 | 5 | Cálculo de digitación (qué dedo toca cada nota de un acorde) | 🔲 documentada, prioridad baja — se retoma más adelante |
 
 ---
@@ -139,8 +139,8 @@ Reglas puramente matemáticas sobre los dos conjuntos de notas, sin curaduría d
 2. **Modo / rotación** — mismo conjunto de notas, tomando otra nota como raíz. Generaliza "relativa mayor/menor" a cualquier fórmula (la menor natural es el modo eólico de la mayor — un caso particular de esta regla, no hace falta una regla aparte) y también cubre inversiones de acorde (mismas notas, otro bajo).
 3. **Subconjunto / superconjunto** — las notas de A están contenidas en B, o viceversa (C ⊂ Cmaj7 ⊂ escala mayor de Do).
 4. **Complemento** — cuando A ⊆ B, qué notas le faltan a A para llegar a B (útil para "qué le agrego a este acorde para llegar a tal escala/extensión").
-5. **Notas compartidas / similaridad** — cuántas notas tienen en común dos entidades cualesquiera, aunque ninguna sea subconjunto exacto de la otra (sirve para sugerir sustitutos o "cosas que suenan parecido").
-6. **Función tonal** — ¿la raíz de A cae en el grado N de alguna escala B del catálogo, y las notas de A matchean (aprox.) el acorde diatónico de ese grado? Se evalúa contra *todas* las escalas del catálogo, no contra una fija, así devuelve varios pares (tonalidad, grado) por entidad.
+5. **Notas compartidas / similaridad (confirmado)** — score como *proporción* de notas compartidas sobre el tamaño de la fórmula más chica (no un conteo crudo, para que sea comparable entre un acorde de 3 notas y una escala de 7). Sin umbral mínimo fijo: se ordena todo por score descendente y el corte de cuántas se muestran es un límite de interfaz ("primeras N"), no un filtro semántico — el número exacto se ajusta en la instancia de implementación.
+6. **Función tonal (confirmado)** — ¿la raíz de A cae en el grado N de alguna escala B del catálogo, y las notas de A matchean (aprox.) el acorde diatónico de ese grado? Corre contra **cualquier escala del catálogo**, no solo las de 7 notas (tonalidades clásicas) — el cálculo no depende de eso. Para pentatónicas u otros modos, el "grado" es simplemente la posición dentro de esa fórmula (1º, 2º, 3º...), aunque no sea la nomenclatura estándar de tonalidad mayor/menor. Se evalúa contra *todas* las escalas del catálogo, no contra una fija, así devuelve varios pares (tonalidad, grado) por entidad.
 
 **Lista extendida (futuro probable, requieren más curaduría teórica o son más específicas):**
 
@@ -149,10 +149,6 @@ Reglas puramente matemáticas sobre los dos conjuntos de notas, sin curaduría d
 - **Dominante secundario / II–V relativo** — relaciones de progresión, no solo de pares (requiere pensar secuencias, no solo relaciones binarias — puede que ni siquiera entre en este sistema de "relaciones entre dos entidades" y termine siendo otra feature).
 - **Distancia armónica por círculo de quintas** — qué tan "cerca" están dos raíces en el círculo de quintas, como métrica de afinidad.
 - **Sustituciones por tensión** — variantes que comparten función pero agregan/sacan tensiones (V7, V7b9, V7#5) — probablemente un caso más específico de "notas compartidas" con un umbral alto.
-
-**Abierto:**
-- Para la regla de "notas compartidas", ¿hace falta un umbral mínimo (ej. al menos 2 notas en común) para que valga la pena mostrarlo como relación, o se muestra todo con su score y se ordena?
-- ¿El resultado de "función tonal" se limita a escalas de 7 notas (tonalidades clásicas) o también corre contra escalas de la base en general (pentatónicas, modos, etc.), aunque el concepto de "grado" sea menos estándar ahí?
 
 ## 5. Cálculo de digitación (fingers)
 
