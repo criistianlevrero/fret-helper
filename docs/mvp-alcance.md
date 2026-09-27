@@ -47,6 +47,10 @@ La inversión y el tipo de voicing (root position, 1ra/2da/3ra inversión, drop 
 - **Alcance del MVP**: selección **manual** de la posición (clickeando sobre el pintado completo cuál ocurrencia de cada nota usar) + detección automática de qué inversión/voicing resultó. La **sugerencia automática** de posiciones posibles (explorar combinaciones válidas y ofrecerlas, tipo "acá tenés 5 formas de tocar esto") queda para una versión futura.
 - **Guardado anidado**: una posición guardada es una variante del acorde/escala guardado, no una entidad independiente. Es el tercer nivel de la jerarquía de persistencia (ver 1.2): Sesión → Acorde/Escala → Posición.
 
+**Idea anotada para v2 — selección por "lazo":** herramienta de selección arrastrando sobre el diapasón, además del click nota por nota. Tiene dos usos posibles, que podrían resolverse como una sola herramienta con dos modos o como dos herramientas separadas (a definir en la instancia de implementación):
+- **Como atajo de la selección manual**: arrastrar el lazo sobre varias ocurrencias en vez de clickearlas una por una, para llegar al mismo resultado que ya cubre el alcance del MVP de arriba. No cambia el modelo, es puramente una mejora de interacción.
+- **Como forma de acotar la sugerencia automática**: trazar el lazo sobre una zona del mástil para que la app explore y ofrezca ahí las posiciones tocables posibles. Le da un mecanismo concreto a la "sugerencia automática" que este documento ya dejaba pateada a v2 — no es una feature nueva, es una forma posible de disparar esa que ya estaba anotada.
+
 ### 1.2 Sesiones y jerarquía de guardado
 
 Reencuadre (confirmado con el usuario): no se guardan acordes/escalas sueltos, se guardan **sesiones**. Una sesión es un conjunto de entradas de acorde/escala — relacionadas entre sí o no — que se guarda, se nombra y se recupera como un todo. Es la unidad que el usuario "trae de vuelta".
