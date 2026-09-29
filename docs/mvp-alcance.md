@@ -156,4 +156,13 @@ Reglas puramente matemáticas sobre los dos conjuntos de notas, sin curaduría d
 
 ## 5. Cálculo de digitación (fingers)
 
-Prioridad baja para esta etapa. Idea a futuro: dado un acorde (conjunto de notas activas con su traste/cuerda), calcular qué dedo (`Finger`) le corresponde a cada nota, probablemente con reglas de ergonomía (evitar estiramientos grandes, preferir dedos consecutivos en trastes consecutivos, permitir cejilla con el índice, etc.). Hoy el modelo ya tiene el campo `finger` en `Note` y el componente `Fingers` para mostrarlo, pero nadie lo completa ni hay bug fix del enum (`Finger.none === Finger.thumb === 0`). Se retoma cuando se ataque en detalle.
+Prioridad baja para esta etapa — documentado para no perder las ideas, se ataca en detalle más adelante.
+
+**Enfoque en dos pasos (anotado, a confirmar cuando se retome):**
+
+1. **Tabla de formas conocidas, indexada por dibujo, no por acorde**: en vez de guardar una digitación por cada combinación de acorde+raíz (redundante, porque una misma forma física se repite transportada a cualquier traste), la tabla se indexa por la **forma geométrica de la Posición** (feature 1.1) — el patrón relativo de traste por cuerda, normalizado respecto del traste más bajo usado, sin importar qué acorde/raíz representa. Así una sola entrada de, por ejemplo, "forma de cejilla mayor" sirve para cualquier acorde mayor tocado con esa forma en cualquier traste: se busca la posición actual contra las formas conocidas y, si matchea, se transporta la digitación guardada.
+2. **Función de costo como fallback**: cuando la posición no matchea ninguna forma conocida (voicing armado libremente por el usuario, fuera de catálogo), se calcula la digitación con una búsqueda con función de costo: se generan las asignaciones dedo→nota que cumplen reglas duras (los dedos no se cruzan de traste, salvo cejilla con el índice; un dedo no puede estar en dos trastes distintos a la vez) y se elige la de menor costo según ergonomía (estiramiento total, penalizar dedos débiles en trastes lejanos, premiar cejilla cuando aplica).
+
+**Idea anotada — la misma función de costo podría definir "tocable" (a confirmar, no es una decisión de arquitectura todavía):** hoy 1.1 define que una posición es tocable con un criterio heurístico simple (una nota por cuerda + ventana de alcance de mano configurable), que se mantiene sin cambios para el MVP ya cerrado. La búsqueda con función de costo, al intentar generar una asignación de dedos, ya prueba de forma **exacta** si existe alguna asignación válida — si no hay ninguna, la posición no es tocable, sin depender de un umbral aproximado de trastes. Cuando se ataque esta feature en detalle, esto podría reemplazar o refinar el heurístico de 1.1.
+
+Hoy el modelo ya tiene el campo `finger` en `Note` y el componente `Fingers` para mostrarlo, pero nadie lo completa ni hay bug fix del enum (`Finger.none === Finger.thumb === 0`). Se retoma cuando se ataque en detalle.
