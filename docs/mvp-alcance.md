@@ -13,6 +13,7 @@ Este documento se va completando **feature por feature**, a medida que las discu
 | 3 | Identificar acordes a partir del dibujo del usuario (incluye qué inversión/voicing quedó armado) | 🟢 cerrada para MVP |
 | 4 | Relacionar acordes y escalas entre sí (tipos de relación a definir) | 🟢 cerrada para MVP |
 | 5 | Cálculo de digitación (qué dedo toca cada nota de un acorde) | 🔲 documentada, prioridad baja — se retoma más adelante |
+| 6 | Reproducción (audio) de acordes y escalas con patrón/dirección/velocidad configurables | 🟢 cerrada para MVP |
 
 ---
 
@@ -166,3 +167,17 @@ Prioridad baja para esta etapa — documentado para no perder las ideas, se atac
 **Idea anotada — la misma función de costo podría definir "tocable" (a confirmar, no es una decisión de arquitectura todavía):** hoy 1.1 define que una posición es tocable con un criterio heurístico simple (una nota por cuerda + ventana de alcance de mano configurable), que se mantiene sin cambios para el MVP ya cerrado. La búsqueda con función de costo, al intentar generar una asignación de dedos, ya prueba de forma **exacta** si existe alguna asignación válida — si no hay ninguna, la posición no es tocable, sin depender de un umbral aproximado de trastes. Cuando se ataque esta feature en detalle, esto podría reemplazar o refinar el heurístico de 1.1.
 
 Hoy el modelo ya tiene el campo `finger` en `Note` y el componente `Fingers` para mostrarlo, pero nadie lo completa ni hay bug fix del enum (`Finger.none === Finger.thumb === 0`). Se retoma cuando se ataque en detalle.
+
+## 6. Reproducción (audio) de acordes y escalas
+
+Toma una **Posición** ya armada (feature 1.1) — nunca una Entrada sin posición elegida — porque hace falta la altura real (nota + octava) de cada nota para poder sonar, y eso es justo lo que fija una Posición al asignar cada nota a una cuerda/traste concretos.
+
+**Confirmado: tres parámetros independientes y combinables entre sí**, configurables desde el arranque del MVP (no hay versión fija para después hacerla configurable en v2):
+
+1. **Patrón** — el orden relativo en que suenan las notas. Catálogo abierto a crecer (mismo enfoque que el catálogo de reglas de relación de la feature 4), arranca con dos:
+   - **Por cuerda**: recorre las notas en el orden de las cuerdas usadas en la posición.
+   - **Salteado**: patrón de ida y vuelta tipo arpegio "rolling" (salta una nota, vuelve a la anterior, vuelve a saltear...). El algoritmo exacto (qué índices visita en qué orden) se define en la instancia de implementación; acá solo se fija que es un patrón con nombre propio, distinto del recorrido simple por cuerda.
+2. **Dirección** — ascendente / descendente. Se aplica a cualquier patrón del catálogo invirtiendo su recorrido; no es parte del patrón en sí.
+3. **Velocidad (espaciado entre notas)** — un parámetro continuo de tiempo entre nota y nota, también aplicable a cualquier patrón. Sus dos extremos tienen nombre propio: "rápido" (tipo rasgueo, las notas casi se superponen) y "lento" (tipo arpegio, notas bien separadas). No hace falta un modo "todas juntas" aparte — es simplemente el extremo más rápido de este mismo parámetro.
+
+**Sonido (confirmado):** sintetizador simple (osciladores, no muestras de guitarra real), con una **envolvente** (ataque rápido + decaimiento) para que suene a nota pulsada y no a tono senoidal plano y continuo. Es el mínimo necesario para que se perciba como guitarra sin necesitar samples grabados.
