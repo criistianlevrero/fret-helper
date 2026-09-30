@@ -4,6 +4,7 @@ App para pintar escalas y acordes sobre el diapasón de una guitarra, identifica
 
 - Estado actual del código: [`docs/estado-actual.md`](docs/estado-actual.md)
 - Alcance del MVP (en discusión): [`docs/mvp-alcance.md`](docs/mvp-alcance.md)
+- Interacción y flujos (borrador, previo al wireframe): [`docs/interaccion.md`](docs/interaccion.md)
 
 ## Desarrollo
 
